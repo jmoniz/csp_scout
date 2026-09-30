@@ -1,0 +1,32 @@
+# Binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/server
+/backend/server
+
+# Database and SQLite runtime files
+*.db
+*.db-wal
+*.db-shm
+data/
+
+# Node & Frontend dependencies and build artifacts
+node_modules/
+.svelte-kit/
+build/
+dist/
+.env
+.env.*
+!.env.example
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Impeccable local cache and critique snapshots
+.impeccable/
