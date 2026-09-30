@@ -59,7 +59,7 @@
 </script>
 
 <svelte:head>
-	<title>CSP Scout - Report-Only Collector & Policy Generator</title>
+	<title>CSP Scout - CSP Collector & Policy Generator</title>
 	<meta name="description" content="Capture Content-Security-Policy-Report-Only violations, triage blocked origins, and generate production-ready CSP rules." />
 </svelte:head>
 
@@ -79,7 +79,7 @@
 							<span>CSP Scout</span>
 							<span class="text-[10px] font-mono uppercase bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-500/20">v1.0</span>
 						</div>
-						<p class="text-xs text-slate-400 -mt-0.5 hidden sm:block">Report-Only Collector & Policy Generator</p>
+						<p class="text-xs text-slate-400 -mt-0.5 hidden sm:block">CSP Collector & Policy Generator</p>
 					</div>
 				</a>
 			</div>
