@@ -57,7 +57,7 @@ flowchart TD
 ## Quick Start (Local Development)
 
 ### Prerequisites
-- [Go](https://go.dev/) 1.24+
+- [Go](https://go.dev/) 1.26+
 - [Node.js](https://nodejs.org/) 20+
 
 ### 1. Start the Backend API (:8080)
