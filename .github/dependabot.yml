@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Check Go dependencies weekly
+  - package-ecosystem: "gomod"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Check Node / SvelteKit dependencies weekly
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Check GitHub Actions dependencies weekly
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
