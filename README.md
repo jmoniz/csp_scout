@@ -1,6 +1,15 @@
-# CSP Report Collector & Policy Generator
+# CSP Scout — CSP Report Collector & Policy Generator
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
+[![W3C CSP](https://img.shields.io/badge/W3C-CSP%20Level%202%20%26%203-indigo.svg)](https://www.w3.org/TR/CSP3/)
 
 A modern developer tool designed to capture Content Security Policy (CSP) violations reported by browsers running in `Content-Security-Policy-Report-Only` mode, inspect and triage blocked resources by directive and origin, and generate production-ready CSP rules.
+
+![CSP Scout Dashboard and Policy Generator](docs/images/dashboard.png)
 
 ---
 
@@ -246,3 +255,19 @@ node scripts/test_e2e.mjs
 cd frontend
 npm run build
 ```
+
+---
+
+## Documentation
+
+Comprehensive design specifications and product planning documents are maintained in the [`docs/`](docs/) directory:
+
+- 📐 [**Architecture & Design Specifications**](docs/DESIGN.md) — Design system tokens, UI component hierarchy, SQLite database schemas, and normalizer algorithms.
+- 📋 [**Product Requirements Document (PRD)**](docs/PRODUCT.md) — Problem statement, target developer personas, user journeys, core workflows, and roadmap.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
