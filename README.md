@@ -35,59 +35,9 @@ A modern developer tool designed to capture Content Security Policy (CSP) violat
 
 ---
 
-## Architecture & Data Flow
+## Quick Start
 
-```mermaid
-flowchart TD
-    subgraph Browser ["Target Website under Analysis"]
-        Ext["Browser Extension / Proxy (Lazy Header Editor)"] -.->|Injects CSP-Report-Only Header| Page["Analyzed Web Application"]
-        Page -->|POST CSP Violation Reports| Ingest["POST /api/reports/{sessionId}"]
-    end
-
-    subgraph Backend ["Go Backend (:8080)"]
-        Ingest --> Normalizer["Origin & Directive Normalizer"]
-        Normalizer --> DB[("SQLite Database")]
-        REST["REST API Controllers"] --> DB
-    end
-
-    subgraph Frontend ["SvelteKit UI (:5173 / :3000)"]
-        UI["Triage Dashboard & Live CSP Generator"] <-->|Vite Proxy /api/*| REST
-    end
-
-    subgraph Deployment ["Docker Deployment"]
-        Compose["docker-compose.yml"] --> C_API["Backend Container (Go)"]
-        Compose --> C_UI["Frontend Container (SvelteKit)"]
-        Compose --> Volume[("Persistent SQLite Volume")]
-    end
-```
-
----
-
-## Quick Start (Local Development)
-
-### Prerequisites
-- [Go](https://go.dev/) 1.26+
-- [Node.js](https://nodejs.org/) 20+
-
-### 1. Start the Backend API (:8080)
-```bash
-cd backend
-go run ./cmd/server
-```
-The Go API will start on `http://localhost:8080` and initialize the SQLite database in `./data/csp_reports.db`.
-
-### 2. Start the SvelteKit Frontend (:5173)
-In another terminal:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open your browser at `http://localhost:5173`. The Vite development server automatically proxies `/api` and `/health` requests to `http://localhost:8080`.
-
----
-
-## Docker Deployment
+### 1. Docker Deployment (Recommended)
 
 To build and start both the backend and frontend using Docker Compose:
 
@@ -103,6 +53,28 @@ To stop the containers:
 ```bash
 docker compose down
 ```
+
+### 2. Local Development (Alternative)
+
+#### Prerequisites
+- [Go](https://go.dev/) 1.26+
+- [Node.js](https://nodejs.org/) 20+
+
+#### Start the Backend API (:8080)
+```bash
+cd backend
+go run ./cmd/server
+```
+The Go API will start on `http://localhost:8080` and initialize the SQLite database in `./data/csp_reports.db`.
+
+#### Start the SvelteKit Frontend (:5173)
+In another terminal:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open your browser at `http://localhost:5173`. The Vite development server automatically proxies `/api` and `/health` requests to `http://localhost:8080`.
 
 ---
 
@@ -167,71 +139,6 @@ Standardized error format returned for 4xx/5xx responses:
     "details": null
   }
 }
-```
-
----
-
-## Database Schema (SQLite)
-
-The backend uses pure-Go embedded SQLite (`modernc.org/sqlite`) with WAL mode enabled (`PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;`) for high-concurrency report ingestion.
-
-```sql
-CREATE TABLE IF NOT EXISTS session (
-    id TEXT PRIMARY KEY,               -- UUID
-    name TEXT NOT NULL,
-    target_origin TEXT NOT NULL,       -- e.g. "https://app.example.com"
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS raw_report (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT NOT NULL,
-    document_uri TEXT,
-    referrer TEXT,
-    violated_directive TEXT NOT NULL,
-    effective_directive TEXT NOT NULL,
-    original_policy TEXT,
-    disposition TEXT,
-    blocked_uri TEXT NOT NULL,
-    line_number INTEGER,
-    column_number INTEGER,
-    source_file TEXT,
-    status_code INTEGER,
-    script_sample TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(session_id) REFERENCES session(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS violation_group (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT NOT NULL,
-    directive TEXT NOT NULL,           -- e.g. "connect-src", "script-src"
-    origin_host TEXT NOT NULL,         -- e.g. "https://api.example.com" or "data:"
-    suggested_wildcard TEXT,           -- e.g. "https://*.example.com"
-    is_self BOOLEAN DEFAULT 0,         -- 1 if origin matches session target_origin
-    count INTEGER DEFAULT 1,
-    last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status TEXT DEFAULT 'pending',     -- 'pending' | 'approved_origin' | 'approved_wildcard' | 'approved_self' | 'rejected' | 'ignored'
-    UNIQUE(session_id, directive, origin_host),
-    FOREIGN KEY(session_id) REFERENCES session(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS session_policy_setting (
-    session_id TEXT PRIMARY KEY,
-    default_src TEXT DEFAULT "'none'",
-    form_action TEXT DEFAULT "'none'",
-    frame_ancestors TEXT DEFAULT "'none'",
-    upgrade_insecure_requests BOOLEAN DEFAULT 0,
-    block_all_mixed_content BOOLEAN DEFAULT 0,
-    report_only BOOLEAN DEFAULT 0,
-    custom_directives TEXT DEFAULT '',
-    FOREIGN KEY(session_id) REFERENCES session(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_raw_report_session_id ON raw_report(session_id);
-CREATE INDEX IF NOT EXISTS idx_violation_group_lookup ON violation_group(session_id, directive, status);
 ```
 
 ---
