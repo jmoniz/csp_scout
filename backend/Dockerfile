@@ -13,11 +13,11 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/server ./cmd/server
 
 # Stage 2: Minimal runtime image
-FROM alpine:3.21
+FROM alpine:3.24
 
 WORKDIR /app
 
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk --no-cache upgrade && apk --no-cache add ca-certificates tzdata
 
 RUN mkdir -p /app/data
 
